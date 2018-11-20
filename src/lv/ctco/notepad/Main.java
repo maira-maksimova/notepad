@@ -1,6 +1,7 @@
 package lv.ctco.notepad;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,8 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
         for (; ; ) {
-            System.out.println("cmd: ");
-            String cmd = scanner.next();
+            String cmd = askString("cmd: ");
             switch (cmd) {
                 case "create":
                     createPerson();
@@ -23,6 +23,9 @@ public class Main {
                 case "list":
                     showList();
                     break;
+                case "delete":
+                    delete();
+                    break;
                 case "exit":
                     return;
                 default:
@@ -31,16 +34,25 @@ public class Main {
         }
     }
 
-    private static void showList() {
-        if (records.size()>0){
-            for (Person p: records) {
-                p.printPersonDetails();
+    private static void delete() {
+        int id = askInt("Enter Id of person to delete");
+        for (int i=0; i<records.size();i++) {
+            if (records.get(i).getId()== id) {
+                records.remove(i);
+                break;
             }
         }
-        else {
+    }
+
+    private static void showList() {
+        if (records.size() > 0) {
+//            for (Person p : records) {
+//                p.printPersonDetails();
+//            }
+            records.forEach(person -> System.out.println(person));
+        } else {
             System.out.println("No records to show");
         }
-
     }
 
     private static void showHelp() {
@@ -51,16 +63,55 @@ public class Main {
     }
 
     private static void createPerson() {
-        System.out.println("Enter name");
-        String name = scanner.next();
-        System.out.println("Enter lastname");
-        String lastname = scanner.next();
-        System.out.println("Enter email");
-        String email = scanner.next();
+        Person person = new Person();
+        person.setName(askString("Enter name"));
+        person.setLastname(askString("Enter lastname"));
+        person.setEmail(askString("Enter email"));
+        person.setPhone(askPhone());
 
-        Person person = new Person(name,lastname,email);
         records.add(person);
+    }
+
+    private static String askPhone() {
+        while (true) {
+            String result = askString("Enter Phone");
+            if (result.length() < 5) {
+                System.out.println("Phone must be at least 5 symbols");
+                continue;
+            } else {
+                return result;
+            }
+        }
+    }
+
+    public static String askString(String msg) {
+        System.out.println(msg);
+        while (true) {
+            String result = scanner.next();
+            if (result.startsWith("\"")) {
+                while (!result.endsWith("\"")) {
+                    result = String.join(" ", result, scanner.next());
+                }
+            }
+            return result;
+        }
 
     }
 
+    public static int askInt(String msg) {
+        System.out.println(msg);
+        return readInt();
+    }
+
+    private static int readInt() {
+        while (true) {
+            try {
+                int userNum = scanner.nextInt();
+                return userNum;
+            } catch (InputMismatchException e) {
+                scanner.next();
+                System.out.println("Please enter a number");
+            }
+        }
+    }
 }
