@@ -32,13 +32,15 @@ public class Main {
     }
 
     private static void showList() {
-        if (records.size()==0){
+        if (records.size()>0){
+            for (Person p: records) {
+                p.printPersonDetails();
+            }
+        }
+        else {
             System.out.println("No records to show");
-            return;
         }
-        for (Person p: records) {
-            p.printPersonDetails();
-        }
+
     }
 
     private static void showHelp() {
