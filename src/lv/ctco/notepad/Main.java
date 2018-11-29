@@ -7,19 +7,33 @@ import java.util.Scanner;
 
 public class Main {
     static Scanner scanner = new Scanner(System.in);
-    static List<Person> records = new ArrayList<>();
+    static List<Record> records = new ArrayList<>();
 
     public static void main(String[] args) {
-        for (; ; ) {
-            System.out.println("cmd: ");
+        for (; ;) {
+            System.out.print("cmd: ");
             String cmd = scanner.next();
             switch (cmd) {
-                case "create":
-                    createPerson();
+                case "search":
+                    search();
+                    break;
+                case "cp":
+                case "createPerson":
+                    createRecord(new Person());
+                    break;
+                case "cn":
+                case "createNote":
+                    createRecord(new StickyNote());
+                    break;
+                case "cr":
+                case "createReminder":
+                    createRecord(new Reminder());
                     break;
                 case "help":
                     showHelp();
                     break;
+                case "delete":
+                    deleteRecordById();
                 case "list":
                     showList();
                     break;
@@ -31,34 +45,89 @@ public class Main {
         }
     }
 
+    private static void search() {
+        String ss = askString("What do you want to find?");
+
+        records.stream()
+                .filter(r -> r.contains(ss))
+                .forEach(System.out::println);
+
+    }
+
+    private static void createRecord(Record record) {
+        record.askData();
+        records.add(record);
+        System.out.println(record);
+    }
+
+    private static void deleteRecordById() {
+        int id = askInt("ID to delete");
+        for (int i = 0; i < records.size(); i++) {
+            Record r = records.get(i);
+            if (r.getId() == id) {
+                records.remove(i);
+                break;
+            }
+        }
+        showList();
+    }
+
     private static void showList() {
-        if (records.size()==0){
-            System.out.println("No records to show");
-            return;
-        }
-        for (Person p: records) {
-            p.printPersonDetails();
-        }
+        records.forEach(System.out::println);
     }
 
     private static void showHelp() {
-        System.out.println("Enter 'create' to create new record");
-        System.out.println("Enter 'help' to get help");
-        System.out.println("Enter 'list' to see list of persons");
-        System.out.println("Enter 'exit' to exit the notepad");
-    }
-
-    private static void createPerson() {
-        System.out.println("Enter name");
-        String name = scanner.next();
-        System.out.println("Enter lastname");
-        String lastname = scanner.next();
-        System.out.println("Enter email");
-        String email = scanner.next();
-
-        Person person = new Person(name,lastname,email);
-        records.add(person);
 
     }
 
+    public static String askString(String msg) {
+        for (;;) {
+            System.out.print(msg + ": ");
+            String val = scanner.next();
+            if (!val.startsWith("\"")) {
+                return val;
+            }
+            List<String> words = new ArrayList<>();
+            words.add(val);
+            while (!val.endsWith("\"")) {
+                val = scanner.next();
+                words.add(val);
+            }
+            String result = String.join(" ", words);
+            result = result.substring(1, result.length() - 1);
+            if (result.length() < 1) {
+                System.out.println("at least one character, please");
+                continue;
+            }
+            return result;
+        }
+    }
+
+    public static int askInt(String msg) {
+        System.out.print(msg + ": ");
+        return scanner.nextInt();
+    }
+
+    public static String askPhone(String msg) {
+        for (; ; ) {
+            String result = askString(msg);
+            boolean hasWrongChars = result.codePoints()
+                    .anyMatch(c -> !(Character.isDigit(c) || Character.isSpaceChar(c) || c == '-' || c == '+'));
+            if (hasWrongChars) {
+                System.out.println("Only numbers, spaces dashes and pluses are allowed");
+                continue;
+            }
+
+            long digitCount = result.codePoints()
+                    .filter(Character::isDigit)
+                    .count();
+            if (digitCount < 5) {
+                System.out.println("Should be 5 or more digits");
+                continue;
+            }
+
+            return result;
+        }
+    }
 }
+
