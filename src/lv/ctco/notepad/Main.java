@@ -5,6 +5,7 @@ import com.sun.org.apache.xerces.internal.impl.dv.DTDDVFactory;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -145,14 +146,26 @@ public class Main {
         }
     }
 
-    public static LocalDate askDate(String msg){
-        String strDate = askString(msg);
-        return LocalDate.parse(strDate,DATE_FORMATTER);
+    public static LocalDate askDate(String msg) {
+        while (true) {
+            String strDate = askString(msg);
+            try {
+                return LocalDate.parse(strDate, DATE_FORMATTER);
+            }   catch (DateTimeParseException e) {
+            System.out.println("Please enter date in format " + DATE_PATTERN);
+        }
+        }
     }
 
     public static LocalTime askTime(String msg) {
-        String strTime = askString(msg);
-        return  LocalTime.parse(strTime, TIME_FORMATTER);
+        while (true) {
+            String strTime = askString(msg);
+            try {
+                return LocalTime.parse(strTime, TIME_FORMATTER);
+            } catch (DateTimeParseException e) {
+                System.out.println("Please enter time in format " + TIME_PATTERN);
+            }
+        }
     }
 }
 
