@@ -1,16 +1,27 @@
 package lv.ctco.notepad;
 
+import com.sun.org.apache.xerces.internal.impl.dv.DTDDVFactory;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static java.time.format.DateTimeFormatter.*;
+
 
 public class Main {
+    public static final String DATE_PATTERN = "uuuu-MM-dd";
+    public static final String TIME_PATTERN = "HH:mm";
+    public static final DateTimeFormatter DATE_FORMATTER = ofPattern(DATE_PATTERN);
+    public static final DateTimeFormatter TIME_FORMATTER = ofPattern(TIME_PATTERN);
     static Scanner scanner = new Scanner(System.in);
     static List<Record> records = new ArrayList<>();
 
     public static void main(String[] args) {
-        for (; ;) {
+        for (; ; ) {
             System.out.print("cmd: ");
             String cmd = scanner.next();
             switch (cmd) {
@@ -28,6 +39,10 @@ public class Main {
                 case "cr":
                 case "createReminder":
                     createRecord(new Reminder());
+                    break;
+                case "ca":
+                case "createAlarm":
+                    createRecord(new Alarm());
                     break;
                 case "help":
                     showHelp();
@@ -81,7 +96,7 @@ public class Main {
     }
 
     public static String askString(String msg) {
-        for (;;) {
+        for (; ; ) {
             System.out.print(msg + ": ");
             String val = scanner.next();
             if (!val.startsWith("\"")) {
@@ -128,6 +143,16 @@ public class Main {
 
             return result;
         }
+    }
+
+    public static LocalDate askDate(String msg){
+        String strDate = askString(msg);
+        return LocalDate.parse(strDate,DATE_FORMATTER);
+    }
+
+    public static LocalTime askTime(String msg) {
+        String strTime = askString(msg);
+        return  LocalTime.parse(strTime, TIME_FORMATTER);
     }
 }
 

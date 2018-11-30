@@ -1,14 +1,16 @@
 package lv.ctco.notepad;
 
-public class Reminder extends StickyNote {
+import java.time.LocalDate;
 
-    private String date;
+public class Reminder extends Alarm {
 
-    public String getDate() {
+    private LocalDate date;
+
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -17,18 +19,23 @@ public class Reminder extends StickyNote {
         return "Reminder{" +
                 "id=" + getId() +
                 ", text='" + getText() + '\'' +
-                "date='" + date + '\'' +
+                ", time=" + getFormattedTime() +
+                ", date='" + getFormattedDate() + '\'' +
                 '}';
     }
 
     @Override
     public boolean contains(String str) {
-        return getText().contains(str) || date.contains(str);
+        return super.contains(str) || getFormattedDate().contains(str);
+    }
+
+    private String getFormattedDate() {
+        return date.format(Main.DATE_FORMATTER);
     }
 
     @Override
     public void askData() {
         super.askData();
-        date = Main.askString("Enter date");
+        date = Main.askDate("Enter date");
     }
 }
