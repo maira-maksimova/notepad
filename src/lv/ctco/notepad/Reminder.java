@@ -1,10 +1,12 @@
 package lv.ctco.notepad;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class Reminder extends Alarm {
+public class Reminder extends Alarm implements Expirable {
 
     private LocalDate date;
+    private boolean dismissed;
 
     public LocalDate getDate() {
         return date;
@@ -38,4 +40,21 @@ public class Reminder extends Alarm {
         super.askData();
         date = Main.askDate("Enter date");
     }
+
+    @Override
+    public boolean isExpired() {
+        if (dismissed){
+            return false;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime dt = LocalDateTime.of(getDate(), getTime());
+        return now.isAfter((dt));
+    }
+
+    @Override
+    public void dismiss() {
+        dismissed = true;
+    }
+
+
 }

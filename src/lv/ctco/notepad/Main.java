@@ -8,8 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
+import static com.sun.deploy.ui.CacheUpdateProgressDialog.dismiss;
 import static java.time.format.DateTimeFormatter.*;
 
 
@@ -26,6 +28,12 @@ public class Main {
             System.out.print("cmd: ");
             String cmd = scanner.next();
             switch (cmd) {
+                case "dismiss":
+                    dismiss();
+                    break;
+                case "expired":
+                    listExpired();
+                    break;
                 case "search":
                     search();
                     break;
@@ -59,6 +67,27 @@ public class Main {
                     System.out.println("Wrong command. Try 'help'");
             }
         }
+    }
+
+    private static void dismiss() {
+        int id = askInt("ID to dismiss");
+
+        Optional<Expirable> first = records.stream()
+                .filter(r -> r.getId() == id)
+                .filter(r -> r instanceof Expirable)
+                .map(r -> (Expirable) r)
+                .findFirst(); //ctrl+ alt + v create variable
+
+        first.ifPresent(Expirable::dismiss);
+
+    }
+
+    private static void listExpired() {
+        records.stream()
+                .filter(r -> r instanceof Expirable)
+                .map(r -> (Expirable)r)
+                .filter(e -> e.isExpired())
+                .forEach(e -> System.out.println(e));
     }
 
     private static void search() {

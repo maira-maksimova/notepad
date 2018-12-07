@@ -1,12 +1,14 @@
 package lv.ctco.notepad;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 /**
  * Created by maira.maksimova01 on 11/30/2018.
  */
-public class Alarm extends StickyNote{
+public class Alarm extends StickyNote implements Expirable {
     private LocalTime time;
+    private LocalDate dismissedAt;
 
     public LocalTime getTime() {
         return time;
@@ -39,5 +41,19 @@ public class Alarm extends StickyNote{
         super.askData();
         time = Main.askTime("Enter time");
 
+    }
+
+    @Override
+    public boolean isExpired() {
+        if (dismissedAt != null && dismissedAt.isEqual(LocalDate.now())){
+            return false;
+        }
+        LocalTime now = LocalTime.now();
+        return now.isAfter(time);
+    }
+
+    @Override
+    public void dismiss() {
+        dismissedAt = LocalDate.now();
     }
 }
